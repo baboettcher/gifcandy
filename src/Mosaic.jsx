@@ -9,15 +9,23 @@ class Mosaic extends Component {
     super(props);
 
     this.state = {
-      loadedMosaicFull: []
+      loadedMosaicFull: [],
+      dropDownOpen: false
     }
     
     this.app = firebase.initializeApp(DB_CONFIG);
     this.database = this.app.database().ref().child('HERE_NEXT');
     this.handleClick = this.handleClick.bind(this);
+    this.toggle = this.toggle.bind(this);
 
   }
 
+  toggle(){
+    this.setState( prevState => ({
+      dropDownOpen: !prevState.dropDownOpen
+    }));
+  }
+  
   handleClick(){
     console.log("CLICK HEARD");
   }
