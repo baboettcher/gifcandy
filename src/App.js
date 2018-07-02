@@ -16,11 +16,12 @@ class App extends Component {
 
   addPictureToMosaic(tileObject){
     // change id, images, title, rating
-    console.log("tileObject-->", tileObject);
+    // console.log("tileObject-->", tileObject);
 
     this.setState({
       currentMosaic : this.state.currentMosaic.concat([tileObject])
     })
+
   }
 
 
@@ -36,7 +37,7 @@ class App extends Component {
 
         <Mosaic currentMosaic = {this.state.currentMosaic}/>
         <PictureLoader addPictureToMosaic={this.addPictureToMosaic}/>
-
+        
       </div>
     );
   }
@@ -44,12 +45,7 @@ class App extends Component {
 
 export default App;
 
-// peudo code / architec
 
-// submit to gify and show result
-// how to convert crat recat app to expres server
-
-// or just add firebase data saving?e
 
 
 // submit go to onclicj function that calls giphy
@@ -66,3 +62,10 @@ export default App;
   // screen is a list of clickable names and and "X" to delete
   // LATER LATER:
   // add user input option to give each giphy a comment, save this to db also
+
+
+  // misc
+  // make them dance / lineup / etc - like danc party?
+  // invaders
+
+

@@ -68,8 +68,8 @@ class PictureLoader extends Component {
   handleClick(id, images, title, rating){
     this.props.addPictureToMosaic({id, images, title, rating})
 
-    // add to keepers
-    // click again to remove
+    // add to firebase
+    // remove from current array and reredner
     
   }
 
