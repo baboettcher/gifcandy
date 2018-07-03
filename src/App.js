@@ -8,18 +8,19 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentMosaic: []
+      currentMosaic: [],
+      latestGif: null
     };
 
-    this.addPictureToMosaic = this.addPictureToMosaic.bind(this);
+    this.setLatestGif = this.setLatestGif.bind(this);
   }
 
-  addPictureToMosaic(tileObject){
+  setLatestGif(tileObject){
     // change id, images, title, rating
     // console.log("tileObject-->", tileObject);
 
     this.setState({
-      currentMosaic : this.state.currentMosaic.concat([tileObject])
+      latestGif : tileObject
     })
 
   }
@@ -27,6 +28,7 @@ class App extends Component {
 
   
   render() {
+    console.log("===>", this.state.latestGif);
 
     return (
       <div className="App">
@@ -35,8 +37,8 @@ class App extends Component {
           <h1 className="App-title">Gif Candy</h1>
         </header>
 
-        <Mosaic currentMosaic = {this.state.currentMosaic}/>
-        <PictureLoader addPictureToMosaic={this.addPictureToMosaic}/>
+        <Mosaic latestGif = {this.state.latestGif}/>
+        <PictureLoader setLatestGif={this.setLatestGif}/>
         
       </div>
     );
