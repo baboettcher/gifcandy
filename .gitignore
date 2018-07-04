@@ -22,4 +22,7 @@ yarn-error.log*
 
 config.js
 
+firebase.js
+
 semantic*
+
