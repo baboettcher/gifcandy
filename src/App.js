@@ -17,7 +17,7 @@ class App extends Component {
 
   setLatestGif(tileObject){
     // change id, images, title, rating
-    // console.log("tileObject-->", tileObject); //
+    // console.log("tileObject-->", tileObject); /////
 
     this.setState({
       latestGif : tileObject
