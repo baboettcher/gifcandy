@@ -31,7 +31,7 @@ class Mosaic extends Component {
   handleClick(id, images, title, rating){
     // change this to erase
 
-    console.log(id, images, title, rating);
+    console.log("MOSAIC-->", id, images, title, rating);
 
     const itemsRef = firebase.database().ref('users/' + CURRENT_USER + "/" + CURRENT_MOSAIC);
 
@@ -51,7 +51,10 @@ class Mosaic extends Component {
   render() {
 
     const { latestGif } = this.props;
-    const latestGifToRender = latestGif ? <img src={latestGif.images.fixed_width_small.url} /> : null
+    const latestGifToRender = latestGif ? <img src={latestGif.images.fixed_height_downsampled.url} onClick={this.handleClick.bind(null, latestGif.id, latestGif.images, latestGif.title, latestGif.rating)}/> : null;
+
+ 
+
 
     console.log("latestGif----->->", latestGif)
 

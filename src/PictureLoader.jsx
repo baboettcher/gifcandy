@@ -120,9 +120,6 @@ class PictureLoader extends Component {
       <div>
         <p>Quiilt / Memory game / Invaders / ML</p>
         <h2> {this.state.randomWord.length ? this.state.randomWord : null}</h2>
-       
-        <img src='https://boygeniusreport.files.wordpress.com/2017/05/dog.jpg?quality=98&strip=all' alt='pooch' height='300px' wide='300px'/>
-
         <div>
           <button onClick={this.randomWord}>Random Word</button>
         </div>
