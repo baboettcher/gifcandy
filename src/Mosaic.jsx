@@ -1,62 +1,97 @@
-import React, { Component } from 'react';
-import './styles/main.css';
+import React, { Component } from "react";
+import _ from "lodash";
+import "./styles/main.css";
 
-import firebase from './firebase.js'; // <--- add this line
+import firebase from "./firebase.js"; // <--- add this line
 
-import { CURRENT_USER, CURRENT_MOSAIC } from './config'
+import { CURRENT_USER, CURRENT_MOSAIC } from "./config";
 
+// TRY without super!?
 class Mosaic extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-
     this.state = {
-      loadedMosaicFull: [],
+      loadedGifArray: [],
       dropDownOpen: false
-    }
-    
+    };
+
     this.handleClick = this.handleClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    
   }
-  
 
-  
-  toggle(){
-    this.setState( prevState => ({
+  componentDidMount() {
+    // this is repeated in componentDidMount/Update
+    const itemsRef = firebase
+      .database()
+      .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC);
+
+    itemsRef
+      .once("value")
+      .then(snapshot => snapshot.val())
+      .then(loadedGifArray => this.setState(() => ({ loadedGifArray })))
+      .then(() => console.log("state!!!", this.state.loadedGifArray));
+  }
+
+  componentDidUpdate() {
+    // add listerner
+  }
+
+  toggle() {
+    this.setState(prevState => ({
       dropDownOpen: !prevState.dropDownOpen
     }));
   }
-  
-  
-  handleClick(id, images, title, rating){
-    // change this to erase
 
-    console.log("MOSAIC-->", id, images, title, rating);
+  handleClick(id, images, title, rating) {
+    console.log("MOSAIC CLICKED-->", id, images, title, rating);
 
-    const itemsRef = firebase.database().ref('users/' + CURRENT_USER + "/" + CURRENT_MOSAIC);
-
+    // this is repeated in componentDidMount/Update
+    const itemsRef = firebase
+      .database()
+      .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC);
 
     const item = {
-      id, 
-      images, 
-      title, 
+      id,
+      images,
+      title,
       rating
-    }
+    };
 
     itemsRef.push(item);
-
   }
-  
 
   render() {
+    let loadedGifArrayDisplay = [];
+    const { loadedGifArray } = this.state;
+
+    if (loadedGifArray) {
+      console.log("YYYYES HERE");
+
+      loadedGifArrayDisplay = _.map(loadedGifArray, item => {
+        return <img src={item.images.fixed_height_small.url} />;
+      });
+
+      console.log("OOOOOOOOO", loadedGifArrayDisplay);
+    }
+
+    //console.log("loadedGifArrayDisplay===>", loadedGifArrayDisplay);
+    //console.log("loadedGifArray===>", loadedGifArray);
 
     const { latestGif } = this.props;
-    const latestGifToRender = latestGif ? <img src={latestGif.images.fixed_height_downsampled.url} onClick={this.handleClick.bind(null, latestGif.id, latestGif.images, latestGif.title, latestGif.rating)}/> : null;
+    const latestGifToRender = latestGif ? (
+      <img
+        src={latestGif.images.fixed_height_downsampled.url}
+        onClick={this.handleClick.bind(
+          null,
+          latestGif.id,
+          latestGif.images,
+          latestGif.title,
+          latestGif.rating
+        )}
+      />
+    ) : null;
 
- 
-
-
-    console.log("latestGif----->->", latestGif)
+    //console.log("latestGif----->->", latestGif);
 
     // this needs to come from firebase
     // const currentMosaicToRender = currentMosaic.map(pic => {
@@ -67,17 +102,13 @@ class Mosaic extends Component {
     //   )
     // })
 
-
-
     return (
-
       <div>
         <div className="topContainer">
-          {latestGifToRender ? latestGifToRender : null }
+          {loadedGifArrayDisplay ? loadedGifArrayDisplay : null}
+          {latestGifToRender ? latestGifToRender : null}
         </div>
-      </div> 
-
-
+      </div>
     );
   }
 }
