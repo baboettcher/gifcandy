@@ -1,26 +1,26 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import "./styles/main.css";
-
+import SingleTile from "./SingleTile";
 import firebase from "./firebase.js"; // <--- add this line
-
 import { CURRENT_USER, CURRENT_MOSAIC } from "./config";
 
-// TRY without super!?
+// DO: TRY without super!?
 class Mosaic extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loadedGifArray: [],
+      gifObjectWithKeys: {}, // this is NOT an array--change this later
       dropDownOpen: false
     };
 
-    this.handleClick = this.handleClick.bind(this);
+    this.handleClickSingleItem = this.handleClickSingleItem.bind(this);
+    this.handleClickMosaicItem = this.handleClickMosaicItem.bind(this);
     this.toggle = this.toggle.bind(this);
   }
 
   componentDidMount() {
-    // this is repeated in componentDidMount/Update
+    // LATER: this "itemsRef" is repeated in componentDidMount/Update
     const itemsRef = firebase
       .database()
       .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC);
@@ -28,12 +28,16 @@ class Mosaic extends Component {
     itemsRef
       .once("value")
       .then(snapshot => snapshot.val())
-      .then(loadedGifArray => this.setState(() => ({ loadedGifArray })))
-      .then(() => console.log("state!!!", this.state.loadedGifArray));
+      .then(rawGifDataNeedingKeys => {
+        console.log("+++++++++HERE++++++", rawGifDataNeedingKeys);
+        return rawGifDataNeedingKeys;
+      })
+      .then(gifObjectWithKeys => this.setState(() => ({ gifObjectWithKeys })))
+      .then(() => console.log("state!!!", this.state.gifObjectWithKeys));
   }
 
   componentDidUpdate() {
-    // add listerner
+    // add listener for change in firebase stuff
   }
 
   toggle() {
@@ -42,11 +46,16 @@ class Mosaic extends Component {
     }));
   }
 
-  handleClick(id, images, title, rating) {
-    console.log("MOSAIC CLICKED-->", id, images, title, rating);
+  // CLICK ITEM FROM MOSAIC
+  handleClickSingleItem(id, images, title, rating) {
+    console.log("BIG PICTURE CLICKED->", id, images, title, rating);
+    console.log("REF-->", "users/" + CURRENT_USER + "/" + CURRENT_MOSAIC);
 
-    // this is repeated in componentDidMount/Update
-    const itemsRef = firebase
+    // 1) Add to state - do this next
+    console.log("STATE:", this.state.gifObjectWithKeys);
+
+    // 2) Add to firebase
+    const itemsRef = firebase // this is repeated in componentDidMount/Update
       .database()
       .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC);
 
@@ -57,31 +66,80 @@ class Mosaic extends Component {
       rating
     };
 
+    // THE REAL PUSH
     itemsRef.push(item);
+
+    // how do i get the damn key???
+
+    // THE TEST PUSH
+    const itemsRefTEST = firebase // this is repeated in componentDidMount/Update
+      .database()
+      .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC + "TEST");
+
+    const itemTEST = {
+      what: "ONCE_GG"
+    };
+
+    // THE TEST PUSH
+    const newKey = itemsRefTEST.push(itemTEST).key;
+    itemsRefTEST.push(itemTEST);
+
+    const itemsRefTESTREMOVE = firebase // this is repeated in componentDidMount/Update
+      .database()
+      .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC + "TEST/" + newKey);
+
+    itemsRefTESTREMOVE.remove();
+  }
+
+  // DELETE ITEM FROM MOSAIC
+  handleClickMosaicItem(id, images, title, rating, firebaseKey) {
+    //console.log("DELETE: MOSAIC iTEM CLICKED->", id, images, title, rating);
+    console.log("DELETE: MOSAIC key-->>>???", firebaseKey);
+
+    // LATER: this filters out ALL items  with this id, so if there is a duplicate, it is lost too
+    const newLoadedGifObject = _.filter(this.state.gifObjectWithKeys, function(
+      item,
+      key
+    ) {
+      console.log("ITEMMMM->", key);
+      return item.id !== id;
+    });
+
+    this.setState(prevState => ({
+      gifObjectWithKeys: newLoadedGifObject
+    }));
+
+    // 2) delete in firebase--HERE!!!!!!!!
+    const itemsRef = firebase // this is repeated in componentDidMount/Update
+      .database()
+      .ref("users/" + CURRENT_USER + "/" + CURRENT_MOSAIC + "/" + id);
+
+    //itemsRef.push(item);
   }
 
   render() {
-    let loadedGifArrayDisplay = [];
-    const { loadedGifArray } = this.state;
+    let gifObjectWithKeysDisplay = [];
+    const { gifObjectWithKeys } = this.state;
 
-    if (loadedGifArray) {
-      console.log("YYYYES HERE");
-
-      loadedGifArrayDisplay = _.map(loadedGifArray, item => {
-        return <img src={item.images.fixed_height_small.url} />;
+    if (gifObjectWithKeys) {
+      gifObjectWithKeysDisplay = _.map(gifObjectWithKeys, imageData => {
+        return (
+          <SingleTile
+            clickHandlerYouGaveMe={this.handleClickMosaicItem}
+            imageData={imageData}
+          />
+        );
       });
-
-      console.log("OOOOOOOOO", loadedGifArrayDisplay);
     }
 
-    //console.log("loadedGifArrayDisplay===>", loadedGifArrayDisplay);
-    //console.log("loadedGifArray===>", loadedGifArray);
+    //console.log("gifObjectWithKeysDisplay===>", gifObjectWithKeysDisplay);
+    //console.log("gifObjectWithKeys===>", gifObjectWithKeys);
 
     const { latestGif } = this.props;
     const latestGifToRender = latestGif ? (
       <img
         src={latestGif.images.fixed_height_downsampled.url}
-        onClick={this.handleClick.bind(
+        onClick={this.handleClickSingleItem.bind(
           null,
           latestGif.id,
           latestGif.images,
@@ -104,8 +162,11 @@ class Mosaic extends Component {
 
     return (
       <div>
+        <div>
+          <button>SHUFFLE - later</button>
+        </div>
         <div className="topContainer">
-          {loadedGifArrayDisplay ? loadedGifArrayDisplay : null}
+          {gifObjectWithKeysDisplay ? gifObjectWithKeysDisplay : null}
           {latestGifToRender ? latestGifToRender : null}
         </div>
       </div>

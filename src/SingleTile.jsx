@@ -1,28 +1,18 @@
-import React, { Component } from 'react';
-import imageChecker from './imageChecker'
-
+import React, { Component } from "react";
+//  import imageChecker from "./imageChecker"; // make sure image is valid size, or add user filters here
 class SingleTile extends Component {
-  constructor(props){
-    super(props)
-
-  }
-
-
-
   render() {
-    const { picturesLoaded } = this.props;
+    const { imageData, clickHandlerYouGaveMe } = this.props;
+    //console.log("IMAGEDATA", imageData);
 
-    console.log(picturesLoaded)
-
-    let picturesToDisplay = <img src=""/>
-
-
-
+    //return <div>{picturesLoaded ? picturesLoaded : null}</div>;
     return (
-
       <div>
-      Picture Tiles
-      { picturesLoaded ? picturesLoaded : null }
+        <img
+          src={imageData.images.fixed_height_small.url}
+          alt={imageData.title}
+          onClick={clickHandlerYouGaveMe.bind(null, imageData.id)}
+        />
       </div>
     );
   }
